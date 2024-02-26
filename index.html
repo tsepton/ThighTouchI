@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug page</title>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        #cube {
+            margin-top: 1rem;
+            width: calc(50vh * 16 / 9);
+            height: 50vh;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            transition: opacity 0.5s;
+            position: relative;
+        }
+
+        .hidden {
+            visibility: hidden;
+            opacity: 0
+        }
+
+        [class^="touch-point-"] {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #312F2F; 
+            border-radius: 50%;
+            transition: all 0.1s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <small id="status">Connecting...</small>
+        <div id="cube" class="hidden"></div>
+    </div>
+
+    <script>
+
+        const socket = new WebSocket('ws://192.168.0.148:8001/ws');
+
+        const statusElem = document.getElementById("status")
+
+        const cubeElem = document.getElementById("cube")
+
+        socket.addEventListener("message", (event) => {
+
+            const data = JSON.parse(event.data)
+
+            isBeingUsed = data.shift() // Always 1 when emitting data... Not sure what this is about
+            
+            for (let index = 0; index < event.data.length; index += 6) {
+                touchPointData = data.slice(index, index + 6);
+                if (touchPointData.length < 6) break;
+                if (touchPointData.reduce((accumulator, currentValue) => accumulator + currentValue) === 0) break;
+                
+                console.log(touchPointData)
+
+                isBeingTouched = touchPointData[0] === 7
+                fingerId = touchPointData[1] // 1 if first to touch, 2 if 2nd, and so on. When I release the first, the others keep their ids.
+                
+                coordinatesX = touchPointData[3] // values ranging from 0 to 15
+                offsetX = touchPointData[2] // Range from 0 to 256
+                
+                coordinatesY = touchPointData[5] // values ranging from 0 to 15
+                offsetY = touchPointData[4] // Range from 0 to 256
+
+                drawFinger(fingerId, coordinatesX + ((offsetX / 256.0) * 1), coordinatesY + ((offsetY / 256.0) * 1), isBeingTouched)
+            }
+            
+        });
+
+        socket.addEventListener("open", () => {
+            console.log("WebSocket connection established.");
+            statusElem.innerHTML = "Connected"
+            cubeElem.className = ""
+        });
+
+        socket.addEventListener("close", () => {
+            console.log("WebSocket connection closed.");
+            statusElem.innerHTML = "Connection closed. Refresh the page."
+            cubeElem.className = "hidden"
+        });
+
+        socket.addEventListener("error", (error) => {
+            console.error("WebSocket error:", error);
+            statusElem.innerHTML = "Connection closed. Refresh the page."
+            cubeElem.className = "hidden"
+        });
+
+
+        function drawFinger(fingerId, coordinatesX, coordinatesY, isBeingTouched) {
+            const cubeWidth = cubeElem.offsetWidth;
+            const cubeHeight = cubeElem.offsetHeight;
+            const touchX = (coordinatesX / 15.0) * cubeWidth;
+            const touchY = (coordinatesY / 15.0) * cubeHeight;
+
+            
+            let touchPointElem = document.querySelector('.touch-point-' + fingerId);
+            if (!isBeingTouched) touchPointElem.remove() 
+            if (!touchPointElem) {
+                touchPointElem = document.createElement('div');
+                touchPointElem.classList.add('touch-point-' + fingerId);
+                cubeElem.appendChild(touchPointElem);
+            }
+            touchPointElem.style.left = touchX + 'px';
+            touchPointElem.style.top = touchY + 'px';         
+        }
+
+    </script>
+
+</body>
+
+</html>
