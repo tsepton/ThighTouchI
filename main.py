@@ -1,5 +1,6 @@
 
 import hid
+import time
 import asyncio
 from aiohttp import web
 
@@ -8,38 +9,50 @@ VENDOR_ID = 1351
 PRODUCT_ID = 12291
 HTML_FILE = 'index.html'
 
-async def main():
-    try:
-        device = hid.device()
-        device.open(VENDOR_ID, PRODUCT_ID)  # TREZOR VendorID/ProductID
+sockets = []
 
-    except IOError as ex:
-        print(ex)
-        print("hid error:")
-        print(device.error())
+async def forward_inputs():
+
+    def open_device(): 
+        try:
+            print("Opening device...")
+            device = hid.device()
+            device.open(VENDOR_ID, PRODUCT_ID)  # TREZOR VendorID/ProductID
+            print("Device ok")
+            return device
+        except Exception as ex:
+            print("HID error:", ex)
+            print("Retrying in 5s...")
+            time.sleep(5)
+            return open_device()
+        
+    device = open_device()
+    loop = asyncio.get_event_loop()
+
+    while True:
+        result = await loop.run_in_executor(None, lambda : str(device.read(64)))
+        for ws in sockets:
+            try:
+                await ws.send_str(result)
+            except ConnectionResetError:
+                print("Connection closed")
+                sockets.remove(ws)
+
+
+async def start_server():
+    print("Starting server on port 8001...")
 
     async def serve_html(request):
         return web.FileResponse(HTML_FILE)
     
     async def websocket_handler(request):
+        print("Connected")
         ws = web.WebSocketResponse()
+        sockets.append(ws)
         await ws.prepare(request)
-
-        async def forward_inputs():
-            while True:
-                try:
-                    data = str(device.read(64))
-                    await ws.send_str(data)
-                except Exception as e:
-                    print(e)
-                    break
-
-        asyncio.create_task(forward_inputs())
-
         async for msg in ws:
             print("Received message: ", msg)
             pass
-
         return ws
 
     app = web.Application()
@@ -50,8 +63,7 @@ async def main():
     await runner.setup()
     site = web.TCPSite(runner, '', 8001)
     await site.start()
-
-    print("Server started on port 8001")
+    print("Server started")
     await asyncio.Future()  
 
 
@@ -62,7 +74,10 @@ def print_devices():
         for key in keys:
             print("%s : %s" % (key, d[key]))
 
+async def main():
+    await asyncio.gather(start_server(), forward_inputs())
+
 
 if (__name__ == "__main__"):
-    print_devices()
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

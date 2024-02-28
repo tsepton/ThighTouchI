@@ -43,7 +43,6 @@
             height: 10px;
             background-color: #312F2F; 
             border-radius: 50%;
-            transition: all 0.1s ease-out;
         }
     </style>
 </head>
@@ -79,11 +78,11 @@
                 isBeingTouched = touchPointData[0] === 7
                 fingerId = touchPointData[1] // 1 if first to touch, 2 if 2nd, and so on. When I release the first, the others keep their ids.
                 
-                coordinatesX = touchPointData[3] // values ranging from 0 to 15
-                offsetX = touchPointData[2] // Range from 0 to 256
+                coordinatesX = touchPointData[3] // 0 <= x <= 15
+                offsetX = touchPointData[2] // 0 <= x < 256
                 
-                coordinatesY = touchPointData[5] // values ranging from 0 to 15
-                offsetY = touchPointData[4] // Range from 0 to 256
+                coordinatesY = touchPointData[5] // 0 <= x <= 256
+                offsetY = touchPointData[4] // 0 <= x < 256
 
                 drawFinger(fingerId, coordinatesX + ((offsetX / 256.0) * 1), coordinatesY + ((offsetY / 256.0) * 1), isBeingTouched)
             }
