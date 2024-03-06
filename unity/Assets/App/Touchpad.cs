@@ -90,7 +90,7 @@ public class Touchpad : MonoBehaviour {
         // Scale
         var distanceFingers = Vector2.Distance(t1.coordinates, t2.coordinates);
         var diffDistance = distanceFingers - initialDistanceFingers;
-        if (diffDistance != 0) EditorApplication.delayCall += () => { OnScale?.Invoke(diffDistance); };
+        if (diffDistance != 0)  OnScale?.Invoke(diffDistance);
         initialDistanceFingers = distanceFingers;
 
         // Rotate
@@ -98,7 +98,7 @@ public class Touchpad : MonoBehaviour {
         var directionCenter = (initialCenter - currentCenter).normalized;
         if (directionCenter != Vector2.zero) {
           var delta = Vector2.Distance(currentCenter, initialCenter);
-          EditorApplication.delayCall += () => { OnRotate?.Invoke(directionCenter, delta); };
+          OnRotate?.Invoke(directionCenter, delta);
         }
         initialCenter = currentCenter;
         
