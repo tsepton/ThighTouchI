@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.WSA;
 
 public class ShowTouchPointsOnCanvas : MonoBehaviour {
 
@@ -7,6 +8,8 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
     
     private GameObject[] _touchPoints;
     private RectTransform[] _touchPointsRect;
+
+    
     
     private void OnEnable() {
         _touchPoints = new GameObject[10]; // Assuming maximum of 10 touch points
@@ -15,6 +18,7 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
     }
 
     public void DrawTouchPoint(TouchPoint touchPoint) {
+        Debug.Log("test");
         Vector2 canvasSize = canvas.sizeDelta; // canvasRect.sizeDelta
         Transform parentTransform = canvas.transform; // Parent the cubes to the canvas
 
