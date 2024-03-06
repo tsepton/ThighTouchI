@@ -104,11 +104,12 @@ public class Touchpad : MonoBehaviour {
         
         // Translate
         // TODO
-        
-        // Selection (press and release + continuous...)
-        // TODO
+
       }
-      else {
+      else if (points.Data[0] != null) {
+        var t1 = (TouchPoint)points.Data[0];
+        OnTouch?.Invoke(t1);
+      } else {
         firstTouch = true;
       }
     }
