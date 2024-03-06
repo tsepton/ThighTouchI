@@ -11,7 +11,7 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
     private void OnEnable() {
         _touchPoints = new GameObject[10]; // Assuming maximum of 10 touch points
         _touchPointsRect = new RectTransform[10];
-        // Touchpad.OnTouch += DrawTouchPoint ;
+        Touchpad.OnTouch += DrawTouchPoint ;
     }
 
     public void DrawTouchPoint(TouchPoint touchPoint) {
@@ -22,12 +22,14 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
         float touchY = (-0.5f + touchPoint.coordinates.y) * canvasSize.y / 5f;
 
         if (!touchPoint.isLast) {
+            Debug.Log("salut 1");
             if (_touchPoints[touchPoint.id] == null) {
                 var newPointer = Instantiate(pointer, parentTransform);
                 _touchPoints[touchPoint.id] = newPointer;
                 _touchPointsRect[touchPoint.id] = newPointer.GetComponent<RectTransform>();
             }
             _touchPointsRect[touchPoint.id].anchoredPosition = new Vector2(touchX, -touchY);
+            Debug.Log(new Vector2(touchX, -touchY));
         }
         else {
             if (_touchPoints[touchPoint.id] != null) {

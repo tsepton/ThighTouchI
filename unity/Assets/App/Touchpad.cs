@@ -16,9 +16,9 @@ public class Touchpad : MonoBehaviour {
 
   public static event Touch OnTouch;
   
-  public delegate void Release(TouchPoint t);
+  public delegate void Select(TouchPoint t);
 
-  public static event Release OnRelease;
+  public static event Select OnSelect;
 
   public delegate void Scale(float delta);
 
@@ -78,6 +78,13 @@ public class Touchpad : MonoBehaviour {
 
       if (_touchPoints.Count == 0) continue;
       var points = _touchPoints.Dequeue();
+
+      for (var i=0; i <10; i++) {
+        var t = points.Data[i];
+        if (t == null) break;
+        OnTouch?.Invoke((TouchPoint)t);
+      }
+      
       if (points.Data[0] != null && points.Data[1] != null) {
         var t1 = (TouchPoint)points.Data[0];
         var t2 = (TouchPoint)points.Data[1];
@@ -105,11 +112,7 @@ public class Touchpad : MonoBehaviour {
         // Translate
         // TODO
 
-      }
-      else if (points.Data[0] != null) {
-        var t1 = (TouchPoint)points.Data[0];
-        OnTouch?.Invoke(t1);
-      } else {
+      } else if (points.Data[0] == null) {
         firstTouch = true;
       }
     }
