@@ -15,16 +15,35 @@ public class TactileManipulation : MonoBehaviour {
 
   private void Start() {
     gazeInteractor.selectEntered.AddListener(OnSelectEntered);
+    gazeInteractor.hoverEntered.AddListener(OnHoverEntered);    
+    gazeInteractor.selectExited.AddListener(OnSelectExited);
+    gazeInteractor.hoverExited.AddListener(OnHoverExited);
   }
   
   private void OnSelectEntered(SelectEnterEventArgs args)
   {
     // Store the selected GameObject
-    Debug.Log("OnSelectEntered");
     _selection = args.interactableObject.transform.gameObject;
-    Debug.Log("Selected: " + _selection.name);
   }
   
+  private void OnHoverEntered(HoverEnterEventArgs args)
+  {
+    // Store the selected GameObject
+    _selection = args.interactableObject.transform.gameObject;
+  }
+  
+  private void OnSelectExited(SelectExitEventArgs args)
+  {
+    // Store the selected GameObject
+    _selection = args.interactableObject.transform.gameObject;
+  }
+  
+  private void OnHoverExited(HoverExitEventArgs args)
+  {
+    // Store the selected GameObject
+    _selection = args.interactableObject.transform.gameObject;
+  }
+
   private void Rotate(Vector2 direction, float delta) {
     if (!_selection) return;
     var velocity = 0.85f; // 0 > x < 1
