@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using WebSocketSharp;
 
@@ -36,18 +35,11 @@ public class Touchpad : MonoBehaviour {
   /// ////////////////////////////////////
   
   private readonly Queue<SimultaneousTouchPoints> _touchPoints = new();
-
-  private TouchGazeDevice _device;
-
+  
   private WebSocket _ws;
 
   private void Start() {
     _ws = new WebSocket($"ws://{uri}");
-
-    // for (var i = 0; i < 10; i++) {
-    // _touchPoints[i] = new Queue<TouchPoint>();
-    // StartCoroutine(HandleClickForMultitouch(i));
-    // }
 
     StartCoroutine(SemanticHandler());
 
@@ -111,9 +103,7 @@ public class Touchpad : MonoBehaviour {
         
         // Translate
         // TODO
-
-      } else if (points.Data[0] == null) {
-        firstTouch = true;
+        if (t1.isLast || t2.isLast) firstTouch = true;
       }
     }
   }
