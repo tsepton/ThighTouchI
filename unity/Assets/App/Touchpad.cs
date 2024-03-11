@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using WebSocketSharp;
 
@@ -15,13 +16,9 @@ public class Touchpad : MonoBehaviour {
 
   public static event Touch OnTouch;
 
-  public delegate void Click(TouchPoint t);
+  public delegate void Release(int touchPointId);
 
-  public static event Click OnClick;
-
-  public delegate void DblClick(TouchPoint t);
-
-  public static event DblClick OnDblClick;
+  public static event Release OnRelease;
 
   public delegate void Scale(float delta);
 
@@ -62,65 +59,83 @@ public class Touchpad : MonoBehaviour {
 
 
   private IEnumerator SemanticHandler() {
+    Dictionary<int, long> previousPoints = new Dictionary<int, long>();
     bool firstTouch = true;
-
     float initialDistanceFingers = 0;
     Vector2 initialCenter = Vector2.zero;
 
-    int y = 0;
+    var loadIndex = 0;
     while (true) {
-      // FIXME - refactor once poc is hover
-      // this allows to handle all new inputs on the main thread. 
-      if (y == 5) {
-        y = 0;
+      // Performance handling
+      // Max 5 touches per iteration 
+      if (loadIndex >= 5) {
+        loadIndex = 0;
         yield return null;
       }
-      else y++;
+      else loadIndex++;
 
-      if (_touchPoints.Count == 0) continue;
-      var points = _touchPoints.Dequeue();
+      var currentPoints = _touchPoints.Count != 0 ? _touchPoints.Dequeue() : null;
 
+      // Release handling
+      var news = currentPoints?.GetTouchPoints() ?? Array.Empty<TouchPoint>();
+      var idsToRemove = new List<int>();
+      foreach (var (id, time) in previousPoints.Where(value => !news.Select(t => t.id).Contains(value.Key))) {
+        if (time + 200L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
+        OnRelease?.Invoke(id);
+        idsToRemove.Add(id);
+      }
+      idsToRemove.ForEach(i => previousPoints.Remove(i));
+      foreach (var touchPoint in news) {
+        previousPoints[touchPoint.id] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+      }
+
+
+      // Touch handling
       for (var i = 0; i < 10; i++) {
-        var t = points.Data[i];
-        if (t == null) break;
-        OnTouch?.Invoke((TouchPoint)t);
+        var currentP = currentPoints?.Data[i];
+        if (currentP == null) break;
+        OnTouch?.Invoke((TouchPoint)currentP);
       }
 
-      if (points.Data[0] != null && points.Data[1] != null) {
-        var t1 = (TouchPoint)points.Data[0];
-        var t2 = (TouchPoint)points.Data[1];
-        if (firstTouch) {
-          firstTouch = false;
-          initialDistanceFingers = Vector2.Distance(t1.coordinates, t2.coordinates);
-          initialCenter = (t1.coordinates + t2.coordinates) / 2f;
-        }
+      if (currentPoints?.Data[0] == null || currentPoints?.Data[1] == null) continue;
 
-        // Scale
-        var distanceFingers = Vector2.Distance(t1.coordinates, t2.coordinates);
-        var diffDistance = distanceFingers - initialDistanceFingers;
-        if (diffDistance != 0) OnScale?.Invoke(diffDistance);
-        initialDistanceFingers = distanceFingers;
-
-        // Rotate
-        var currentCenter = (t1.coordinates + t2.coordinates) / 2f;
-        var directionCenter = (initialCenter - currentCenter).normalized;
-        if (directionCenter != Vector2.zero) {
-          var delta = Vector2.Distance(currentCenter, initialCenter);
-          OnRotate?.Invoke(directionCenter, delta);
-        }
-
-        initialCenter = currentCenter;
-
-        // Translate
-        // TODO
-        if (t1.isLast || t2.isLast) firstTouch = true;
+      var t1 = (TouchPoint)currentPoints.Data[0];
+      var t2 = (TouchPoint)currentPoints.Data[1];
+      if (firstTouch) {
+        firstTouch = false;
+        initialDistanceFingers = Vector2.Distance(t1.coordinates, t2.coordinates);
+        initialCenter = (t1.coordinates + t2.coordinates) / 2f;
       }
+
+      // Scale handling
+      var distanceFingers = Vector2.Distance(t1.coordinates, t2.coordinates);
+      var diffDistance = distanceFingers - initialDistanceFingers;
+      if (diffDistance != 0) OnScale?.Invoke(diffDistance);
+      initialDistanceFingers = distanceFingers;
+
+      // Rotate handling
+      var currentCenter = (t1.coordinates + t2.coordinates) / 2f;
+      var directionCenter = (initialCenter - currentCenter).normalized;
+      if (directionCenter != Vector2.zero) {
+        var delta = Vector2.Distance(currentCenter, initialCenter);
+        OnRotate?.Invoke(directionCenter, delta);
+      }
+
+      initialCenter = currentCenter;
+
+      // Translate handling
+      // TODO 
+      if (t1.isLast || t2.isLast) firstTouch = true;
     }
   }
 }
 
 public class SimultaneousTouchPoints {
   public readonly TouchPoint?[] Data = new TouchPoint?[10];
+
+  public TouchPoint[] GetTouchPoints() {
+    return Data.NotNull().Select(tp => tp.Value).ToArray();
+  }
 
   public SimultaneousTouchPoints(int[] dataFromHid) {
     for (int index = 1, count = 0; index < dataFromHid.Length; index += 6, count++) {
@@ -136,6 +151,9 @@ public class SimultaneousTouchPoints {
 public readonly struct TouchPoint {
   public int id { get; }
 
+  // WARNING
+  // consider using OnRelease as the raspberry does not always emit all touches
+  // and thus last points may be lost along the way.
   public bool isLast { get; }
 
   public Vector2 coordinates { get; }

@@ -14,6 +14,7 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
     _touchPointsRect = new RectTransform[10];
     _touchPointsRenderers = new Renderer[10];
     Touchpad.OnTouch += DrawTouchPoint;
+    Touchpad.OnRelease += HideTouchPoint;
   }
 
   public void Start() {
@@ -32,13 +33,12 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
     float touchX = (-0.5f + touchPoint.coordinates.x) * canvasSize.x / 5f;
     float touchY = (-0.5f + touchPoint.coordinates.y) * canvasSize.y / 5f;
 
-    if (!touchPoint.isLast) {
-      if (!_touchPointsRenderers[touchPoint.id].enabled)
-        _touchPointsRenderers[touchPoint.id].enabled = true;
-      _touchPointsRect[touchPoint.id].anchoredPosition = new Vector2(touchX, -touchY);
-    }
-    else {
-      _touchPointsRenderers[touchPoint.id].enabled = false;
-    }
+    if (!_touchPointsRenderers[touchPoint.id].enabled)
+      _touchPointsRenderers[touchPoint.id].enabled = true;
+    _touchPointsRect[touchPoint.id].anchoredPosition = new Vector2(touchX, -touchY);
+  }
+
+  private void HideTouchPoint(int touchPointId) {
+    _touchPointsRenderers[touchPointId].enabled = false;
   }
 }
