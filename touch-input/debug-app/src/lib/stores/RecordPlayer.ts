@@ -8,7 +8,9 @@ export const currentSequence$: Readable<PlayableSequence> = derived(
 	currentRecord$,
 	($record, set) => {
 		// Transformation logic here
-		const seq = new DeviceSequence(); // TODO get record here and instance a DeviceSequence or Sequence
+		let seq: PlayableSequence;
+		if ($record.id === -1) seq = new CurrentSequence();
+		else seq = new PlaybackSequence($record.data!);
 		set(seq);
 	}
 );
@@ -19,7 +21,7 @@ export interface PlayableSequence {
 	_history: TouchSequence[];
 }
 
-export class DeviceSequence implements PlayableSequence {
+export class CurrentSequence implements PlayableSequence {
 	status$: Writable<string> = writable('Connecting...');
 	currentTouches$: Writable<Touch[]> = writable([]);
 
@@ -98,19 +100,30 @@ export class DeviceSequence implements PlayableSequence {
 	}
 }
 
-// export class Sequence implements PlayableSequence {
-// 	status$: string = 'Done.';
-// 	history: TouchSequence[] = [];
-// 	currentTouches$: Touch[] = [];
+export class PlaybackSequence implements PlayableSequence {
+	status$: Writable<string> = writable('Playback.');
+	currentTouches$: Writable<Touch[]> = writable([]);
+	readingProgression$: Writable<number> = writable(0);
 
-// 	constructor(history: TouchSequence[]) {
-// 		this.history = history;
+	_history: TouchSequence[] = [];
 
-// 		window.setInterval(this.play, 100)
-// 	}
+	constructor(history: TouchSequence[]) {
+		this._history = history;
+		if (this._history.length === 0) this.status$.set('Empty record');
+		else setTimeout(() => this.play(), 100);
+	}
 
-// 	play() {
-// 		this.status$ = 'Playing...';
-// 		this.currentTouches$ = this.history[0].touches; // TODO  +1 on each call + delay call
-// 	}
-// }
+	play(index: number = 0): void {
+		this.status$.set('Playing.');
+		const toPlay = this._history[index];
+		this.currentTouches$.set(toPlay.touches); // TODO  +1 on each call + delay call
+		// TODO timeout should be based upon the diff between timestamps
+		if (index == this._history.length - 1) setTimeout(() => this.play(0), 2000);
+		else
+			setTimeout(
+				() => this.play(index + 1),
+				(toPlay.timestamp - this._history[index + 1].timestamp) * 1000
+			);
+		this.readingProgression$.set((index / this._history.length) * 100);
+	}
+}

@@ -3,6 +3,7 @@ export type Record = {
     id: number;
     name: string;
     date: Date;
+    data: TouchSequence[] | undefined;
 };
 
 export type Touch = {

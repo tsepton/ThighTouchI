@@ -12,7 +12,8 @@
 		{
 			id: -1,
 			name: 'Current interaction',
-			date: new Date()
+			date: new Date(),
+			data: undefined
 		}
 	];
 
@@ -24,15 +25,6 @@
 	let hiddenInput: HTMLInputElement;
 
 	onMount(() => {
-		try {
-			const x = fetch('http://localhost:8001/record', {
-				method: 'GET'
-			});
-			console.log(x);
-		} catch (error) {
-			console.log('Error fetching records:', error);
-		}
-
 		currentRecord$.set(recordings[0]);
 	});
 
@@ -42,15 +34,19 @@
 
 	function handleFileChange(event: any) {
 		const file = event.target.files[0];
-		console.log('Selected file:', file);
-		recordings = [
-			...recordings,
-			{
-				id: recordings.length,
-				name: file.name,
-				date: file.lastModified
-			}
-		];
+		const reader = new FileReader();
+		reader.onload = () => {
+			recordings = [
+				...recordings,
+				{
+					id: recordings.length,
+					name: file.name,
+					date: file.lastModified,
+					data: JSON.parse(reader.result as string)
+				}
+			];
+		};
+		reader.readAsText(file);
 	}
 </script>
 

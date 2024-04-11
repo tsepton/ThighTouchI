@@ -1,11 +1,12 @@
 <script lang="ts">
 	import {
 		currentSequence$,
-		DeviceSequence,
-		type PlayableSequence
+		CurrentSequence,
+		type PlayableSequence,
+		PlaybackSequence
 	} from '$lib/stores/RecordPlayer';
 	import type { Record, Touch } from '$lib/types/Record';
-	import { get } from 'svelte/store';
+	import { get, type Unsubscriber } from 'svelte/store';
 	import Button from './ui/button/button.svelte';
 	import Progress from './ui/progress/progress.svelte';
 	import * as Popover from '$lib/components/ui/popover';
@@ -20,6 +21,8 @@
 
 	let status: string = '';
 
+	let readingProgression: number = 0;
+
 	let touchPoints: { fingerId: number; touchX: number; touchY: number }[] = [];
 
 	let isRecording: boolean = false;
@@ -28,16 +31,36 @@
 
 	let recordName = '';
 
-	$: record, (isPlayback = record.id !== -1);
+	let subscriptions: Unsubscriber[] = [];
 
-	currentSequence$.subscribe((seq) => {
-		seq.status$.subscribe((s) => (status = s));
-		seq.currentTouches$.subscribe((touches) =>
-			touches.forEach((touch) => {
-				drawFinger(touch.fingerId, touch.x, touch.y, touch.isBeingTouched);
+	$: record,
+		(isPlayback = record.id !== -1),
+		(() => {
+			subscriptions.forEach((s) => s());
+			subscriptions = [];
+			handleRecordChange();
+		})();
+
+	// https://www.retinasocal.com/3d-images/burning-eyes-general.jpg
+	// FIXME - refactor
+	function handleRecordChange(): void {
+		subscriptions.push(
+			currentSequence$.subscribe((seq) => {
+				subscriptions.push(seq.status$.subscribe((s) => (status = s)));
+				const temp = (seq as PlaybackSequence).readingProgression$?.subscribe(
+					(p) => (readingProgression = p)
+				);
+				if (temp) subscriptions.push(temp);
+				subscriptions.push(
+					seq.currentTouches$.subscribe((touches) =>
+						touches.forEach((touch) => {
+							drawFinger(touch.fingerId, touch.x, touch.y, touch.isBeingTouched);
+						})
+					)
+				);
 			})
 		);
-	});
+	}
 
 	function drawFinger(
 		fingerId: number,
@@ -68,15 +91,14 @@
 		if (isRecording) throw new Error('Already recording');
 		if (isPlayback) throw new Error('Cannot record while playing back a sequence');
 		isRecording = true;
-		(get(currentSequence$) as DeviceSequence).startRecording();
+		(get(currentSequence$) as CurrentSequence).startRecording();
 	}
 
 	function stopRecord() {
 		if (!isRecording) throw new Error('Nothing to stop recording');
 		if (isPlayback) throw new Error('Cannot record while playing back a sequence');
 		isRecording = false;
-		const touchSequence = (get(currentSequence$) as DeviceSequence).stopRecording();
-		console.log(touchSequence);
+		const touchSequence = (get(currentSequence$) as CurrentSequence).stopRecording();
 		download(`${recordName}.json`, JSON.stringify(touchSequence));
 	}
 
@@ -135,7 +157,7 @@
 		{:else if !isPlayback && isRecording}
 			<Button on:click={stopRecord}>Stop recording {recordName}</Button>
 		{:else if record.id !== -1}
-			<Progress value={33} />
+			<Progress value={readingProgression} />
 		{/if}
 	</div>
 </div>
