@@ -3,25 +3,16 @@
 	import { currentRecord$ } from '$lib/stores/CurrentRecord';
 	import type { Record } from '$lib/types/Record';
 	import { onMount } from 'svelte';
+	import { Button } from './ui/button';
+	import CirclePlus from 'lucide-svelte/icons/circle-plus';
 
 	export let className: string = '';
 
-    const recordings: Record[] = [
+	let recordings: Record[] = [
 		{
 			id: -1,
 			name: 'Current interaction',
 			date: new Date()
-		},
-		// TODO - these should be fetched
-		{
-			id: 1,
-			name: 'Mathieu',
-			date: new Date('2024-10-01')
-		},
-		{
-			id: 2,
-			name: 'Jean',
-			date: new Date('2024-10-02')
 		}
 	];
 
@@ -30,19 +21,59 @@
 		current = record;
 	});
 
-	
+	let hiddenInput: HTMLInputElement;
+
 	onMount(() => {
+		try {
+			const x = fetch('http://localhost:8001/record', {
+				method: 'GET'
+			});
+			console.log(x);
+		} catch (error) {
+			console.log('Error fetching records:', error);
+		}
+
 		currentRecord$.set(recordings[0]);
 	});
 
 	function handleSelection(selection: Record) {
 		currentRecord$.set(selection);
 	}
+
+	function handleFileChange(event: any) {
+		const file = event.target.files[0];
+		console.log('Selected file:', file);
+		recordings = [
+			...recordings,
+			{
+				id: recordings.length,
+				name: file.name,
+				date: file.lastModified
+			}
+		];
+	}
 </script>
 
 <div class="container {className}">
 	<h4 class="text-lg font-medium leading-none">Recordings</h4>
 	<Table.Root>
+		<Table.Caption>
+			<Button
+				variant="outline"
+				size="icon"
+				on:click={() => {
+					hiddenInput.click();
+				}}
+			>
+				<CirclePlus class="h-4 w-4" />
+			</Button>
+			<input
+				id="hidden-file-input"
+				type="file"
+				bind:this={hiddenInput}
+				on:change={handleFileChange}
+			/>
+		</Table.Caption>
 		<Table.Header>
 			<Table.Row>
 				<Table.Head>Name</Table.Head>
@@ -69,5 +100,9 @@
 		flex-direction: column;
 		gap: 3rem;
 		height: 100%;
+	}
+
+	#hidden-file-input {
+		display: none;
 	}
 </style>

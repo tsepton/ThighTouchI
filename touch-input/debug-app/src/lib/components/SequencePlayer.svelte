@@ -1,8 +1,17 @@
 <script lang="ts">
-	import { currentSequence$, type PlayableSequence } from '$lib/stores/RecordPlayer';
+	import {
+		currentSequence$,
+		DeviceSequence,
+		type PlayableSequence
+	} from '$lib/stores/RecordPlayer';
 	import type { Record, Touch } from '$lib/types/Record';
+	import { get } from 'svelte/store';
 	import Button from './ui/button/button.svelte';
 	import Progress from './ui/progress/progress.svelte';
+	import * as Popover from '$lib/components/ui/popover';
+	import { Input } from './ui/input';
+	import { Label } from './ui/label';
+
 	export let className: string = '';
 
 	export let record: Record;
@@ -17,13 +26,17 @@
 
 	let isPlayback: boolean = false;
 
-	$: record, isPlayback = record.id !== -1;
+	let recordName = '';
+
+	$: record, (isPlayback = record.id !== -1);
 
 	currentSequence$.subscribe((seq) => {
-		seq.status$.subscribe((s) => status = s);
-		seq.currentTouches$.subscribe(touches => touches.forEach((touch) => {
-			drawFinger(touch.fingerId, touch.x, touch.y, touch.isBeingTouched);
-		}));
+		seq.status$.subscribe((s) => (status = s));
+		seq.currentTouches$.subscribe((touches) =>
+			touches.forEach((touch) => {
+				drawFinger(touch.fingerId, touch.x, touch.y, touch.isBeingTouched);
+			})
+		);
 	});
 
 	function drawFinger(
@@ -32,7 +45,7 @@
 		coordinatesY: number,
 		isBeingTouched: boolean
 	) {
-		const cubeWidth = surface.offsetWidth; 
+		const cubeWidth = surface.offsetWidth;
 		const cubeHeight = surface.offsetHeight;
 		const touchX = (coordinatesX / 15.0) * cubeWidth;
 		const touchY = (coordinatesY / 15.0) * cubeHeight;
@@ -50,20 +63,46 @@
 			}
 		}
 	}
+
+	function startRecord() {
+		if (isRecording) throw new Error('Already recording');
+		if (isPlayback) throw new Error('Cannot record while playing back a sequence');
+		isRecording = true;
+		(get(currentSequence$) as DeviceSequence).startRecording();
+	}
+
+	function stopRecord() {
+		if (!isRecording) throw new Error('Nothing to stop recording');
+		if (isPlayback) throw new Error('Cannot record while playing back a sequence');
+		isRecording = false;
+		const touchSequence = (get(currentSequence$) as DeviceSequence).stopRecording();
+		console.log(touchSequence);
+		download(`${recordName}.json`, JSON.stringify(touchSequence));
+	}
+
+	function download(filename: string, data: any) {
+		const element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+		element.setAttribute('download', filename);
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+	}
 </script>
 
 <div class="container {className}">
 	<h4 class="mb-2 text-lg font-medium leading-none">Selection</h4>
-	{#if !isPlayback}
-		<div>
-			<small>{record.name}</small>
-		</div>
-		<div>
-			<small>{status}</small>
-		</div>
-	{:else}
+	<div>
 		<small>{record.name}</small>
-	{/if}
+	</div>
+	<div>
+		<small>{status}</small>
+	</div>
+
 	<div id="cube" class="card" bind:this={surface}>
 		{#each touchPoints as touchPoint}
 			<div
@@ -72,13 +111,33 @@
 			></div>
 		{/each}
 	</div>
-	{#if !isPlayback && !isRecording}
-		<Button>Record current</Button>
-	{:else if !isPlayback && isRecording}
-		<Button>Stop recording</Button>
-	{:else if record.id !== -1}
-		<Progress value={33} />
-	{/if}
+	<div class="mt-8 flex justify-center">
+		{#if !isPlayback && !isRecording}
+			<Popover.Root>
+				<Popover.Trigger asChild let:builder>
+					<Button builders={[builder]}>Record</Button>
+				</Popover.Trigger>
+				<Popover.Content>
+					<div class="grid grid-cols-3 items-center">
+						<Label for="record-name">Name</Label>
+						<Input id="record-name" bind:value={recordName} class="col-span-2 h-8" />
+					</div>
+					<div class="mt-5 flex justify-end">
+						<Button
+							on:click={startRecord}
+							size="sm"
+							variant="outline"
+							disabled={recordName.length === 0}>Record current</Button
+						>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+		{:else if !isPlayback && isRecording}
+			<Button on:click={stopRecord}>Stop recording {recordName}</Button>
+		{:else if record.id !== -1}
+			<Progress value={33} />
+		{/if}
+	</div>
 </div>
 
 <style>
