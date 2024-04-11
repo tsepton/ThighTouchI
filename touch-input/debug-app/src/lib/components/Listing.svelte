@@ -2,6 +2,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { currentRecord$ } from '$lib/stores/CurrentRecord';
 	import type { Record } from '$lib/types/Record';
+	import { onMount } from 'svelte';
 
 	export let className: string = '';
 
@@ -29,9 +30,12 @@
 		current = record;
 	});
 
+	
+	onMount(() => {
+		currentRecord$.set(recordings[0]);
+	});
+
 	function handleSelection(selection: Record) {
-		console.log("cuc");
-		
 		currentRecord$.set(selection);
 	}
 </script>
