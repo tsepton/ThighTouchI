@@ -53,27 +53,21 @@
 <div class="container {className}">
 	<h4 class="text-lg font-medium leading-none">Recordings</h4>
 	<Table.Root>
-		<Table.Caption>
-			<Button
-				variant="outline"
-				size="icon"
-				on:click={() => {
-					hiddenInput.click();
-				}}
-			>
-				<CirclePlus class="h-4 w-4" />
-			</Button>
-			<input
-				id="hidden-file-input"
-				type="file"
-				bind:this={hiddenInput}
-				on:change={handleFileChange}
-			/>
-		</Table.Caption>
 		<Table.Header>
 			<Table.Row>
 				<Table.Head>Name</Table.Head>
 				<Table.Head>Date</Table.Head>
+				<Table.Head>
+					<Button
+					variant="ghost"
+						size="icon"
+						on:click={() => {
+							hiddenInput.click();
+						}}
+					>
+						<CirclePlus class="h-4 w-4" />
+					</Button>
+				</Table.Head>
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
@@ -84,10 +78,12 @@
 				>
 					<Table.Cell class="font-medium">{record.name}</Table.Cell>
 					<Table.Cell>{record.date}</Table.Cell>
+					<Table.Cell></Table.Cell>
 				</Table.Row>
 			{/each}
 		</Table.Body>
 	</Table.Root>
+	<input id="hidden-file-input" type="file" bind:this={hiddenInput} on:change={handleFileChange} />
 </div>
 
 <style>

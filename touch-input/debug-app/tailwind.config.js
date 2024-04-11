@@ -10,7 +10,7 @@ const config = {
 			center: true,
 			padding: "2rem",
 			screens: {
-				"2xl": "1400px"
+				"2xl": "2000px"
 			}
 		},
 		extend: {
@@ -33,15 +33,15 @@ const config = {
 					foreground: "hsl(var(--destructive-foreground) / <alpha-value>)"
 				},
 				muted: {
-					DEFAULT: "hsl(var(--muted) / <alpha-value>)",
-					foreground: "hsl(var(--muted-foreground) / <alpha-value>)"
+					DEFAULT: "hsl(var(--muted) / 0.5)",
+					foreground: "hsl(var(--muted-foreground) / 1)"
 				},
 				accent: {
 					DEFAULT: "hsl(var(--accent) / <alpha-value>)",
 					foreground: "hsl(var(--accent-foreground) / <alpha-value>)"
 				},
 				popover: {
-					DEFAULT: "hsl(var(--popover) / <alpha-value>)",
+					DEFAULT: "hsl(var(--popover) / 0.4)",
 					foreground: "hsl(var(--popover-foreground) / <alpha-value>)"
 				},
 				card: {

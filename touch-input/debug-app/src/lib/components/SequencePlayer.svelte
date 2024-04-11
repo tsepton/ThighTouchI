@@ -164,18 +164,22 @@
 
 <style>
 	.container {
+		position: relative;
 		max-width: max-content;
-		min-width: 35vh;
+		min-width: fit-content;
+		max-height: 100%;
 	}
 
 	#cube {
+		position: relative;
 		margin-top: 1rem;
-		height: calc(35vh * 16 / 9);
-		width: 35vh;
+		width: calc(70vh * 9 / 16); /* 16:9 aspect ratio */
+		height: 70vh;
 		background-color: rgba(255, 255, 255, 0.8);
 		border-radius: 2px;
 		transition: opacity 0.5s;
 		position: relative;
+		box-shadow: none;
 	}
 
 	.hidden {

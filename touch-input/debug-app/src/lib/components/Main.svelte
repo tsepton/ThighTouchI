@@ -27,6 +27,5 @@
 		height: 100vh;
 		gap: 2rem;
 		padding: 2rem;
-		max-width: 120rem;
 	}
 </style>
