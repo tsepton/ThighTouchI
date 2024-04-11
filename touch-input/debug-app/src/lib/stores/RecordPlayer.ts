@@ -1,26 +1,25 @@
 import { browser } from "$app/environment";
 import type { Touch, TouchSequence } from "$lib/types/Record";
 import type { Readable } from "svelte/motion";
-import { derived } from "svelte/store";
+import { derived, writable, type Writable } from "svelte/store";
 import { currentRecord$ } from "./CurrentRecord";
 
 export const currentSequence$: Readable<PlayableSequence> = derived(currentRecord$, ($record, set) => {
     // Transformation logic here
-    const seq = undefined; // TODO get record here and instance a DeviceSequence or Sequence
-	
-	set(seq as unknown as PlayableSequence);
+    const seq = new DeviceSequence(); // TODO get record here and instance a DeviceSequence or Sequence
+	set(seq);
 });
 
 export interface PlayableSequence {
+	status$: Writable<string>;
+	currentTouches$: Writable<Touch[]>;
 	history: TouchSequence[];
-	currentTouches: Touch[];
-	status: string;
 }
 
 export class DeviceSequence implements PlayableSequence {
-	status: string = 'Connecting...';
+	status$: Writable<string> = writable('Connecting...');
+	currentTouches$: Writable<Touch[]> = writable([]);
 	history: TouchSequence[] = [];
-	currentTouches: Touch[] = [];
 	socket: WebSocket;
 
 	constructor() {
@@ -58,40 +57,40 @@ export class DeviceSequence implements PlayableSequence {
 					isBeingTouched
                 });
 			}
-			this.currentTouches = touches;
+			this.currentTouches$.set(touches);
             this.history.push({touches, timestamp: Date.now()}); 
 		});
 
 		this.socket.addEventListener('open', () => {
 			console.log('WebSocket connection established.');
-			this.status = 'Connected';
+			this.status$.set('Connected');
 		});
 
 		this.socket.addEventListener('close', () => {
 			console.log('WebSocket connection closed.');
-			this.status = 'Connection closed.';
+			this.status$.set('Connection closed.');
 		});
 
 		this.socket.addEventListener('error', (error) => {
 			console.error('WebSocket error:', error);
-			this.status = 'Connection error.';
+			this.status$.set('Connection error.');
 		});
 	}
 }
 
-export class Sequence implements PlayableSequence {
-	status: string = 'Done.';
-	history: TouchSequence[] = [];
-	currentTouches: Touch[] = [];
+// export class Sequence implements PlayableSequence {
+// 	status$: string = 'Done.';
+// 	history: TouchSequence[] = [];
+// 	currentTouches$: Touch[] = [];
 
-	constructor(history: TouchSequence[]) {
-		this.history = history;
+// 	constructor(history: TouchSequence[]) {
+// 		this.history = history;
 
-		window.setInterval(this.play, 100)
-	}
+// 		window.setInterval(this.play, 100)
+// 	}
 
-	play() {
-		this.status = 'Playing...';
-		this.currentTouches = this.history[0].touches; // TODO  +1 on each call + delay call
-	}
-}
+// 	play() {
+// 		this.status$ = 'Playing...';
+// 		this.currentTouches$ = this.history[0].touches; // TODO  +1 on each call + delay call
+// 	}
+// }

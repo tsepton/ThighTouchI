@@ -7,7 +7,9 @@
 
 	export let record: Record;
 
-	let sequence: PlayableSequence | undefined;
+	let surface: HTMLElement;
+
+	let status: string = '';
 
 	let touchPoints: { fingerId: number; touchX: number; touchY: number }[] = [];
 
@@ -18,15 +20,10 @@
 	$: record, isPlayback = record.id !== -1;
 
 	currentSequence$.subscribe((seq) => {
-		if (!seq) {
-			// TODO
-			console.log(new Error('Not implemented'));
-			return;
-		}
-		sequence = seq;
-		sequence.currentTouches.forEach((touch) => {
+		seq.status$.subscribe((s) => status = s);
+		seq.currentTouches$.subscribe(touches => touches.forEach((touch) => {
 			drawFinger(touch.fingerId, touch.x, touch.y, touch.isBeingTouched);
-		});
+		}));
 	});
 
 	function drawFinger(
@@ -35,8 +32,8 @@
 		coordinatesY: number,
 		isBeingTouched: boolean
 	) {
-		const cubeWidth = 1; //cube.offsetWidth; todo
-		const cubeHeight = 1; //cube.offsetHeight;
+		const cubeWidth = surface.offsetWidth; 
+		const cubeHeight = surface.offsetHeight;
 		const touchX = (coordinatesX / 15.0) * cubeWidth;
 		const touchY = (coordinatesY / 15.0) * cubeHeight;
 
@@ -62,12 +59,12 @@
 			<small>{record.name}</small>
 		</div>
 		<div>
-			<small>{sequence?.status}</small>
+			<small>{status}</small>
 		</div>
 	{:else}
 		<small>{record.name}</small>
 	{/if}
-	<div id="cube" class="card">
+	<div id="cube" class="card" bind:this={surface}>
 		{#each touchPoints as touchPoint}
 			<div
 				class="touch-point-{touchPoint.fingerId}"

@@ -2,7 +2,6 @@
 	import Listing from './Listing.svelte';
 	import { currentRecord$ } from '$lib/stores/CurrentRecord';
 	import type { Record } from '$lib/types/Record';
-	import { Sequence } from '$lib/stores/RecordPlayer';
 	import SequencePlayer from './SequencePlayer.svelte';
 
 	let record: Record | undefined;
@@ -28,5 +27,6 @@
 		height: 100vh;
 		gap: 2rem;
 		padding: 2rem;
+		max-width: 120rem;
 	}
 </style>
