@@ -30,8 +30,8 @@ public class ShowTouchPointsOnCanvas : MonoBehaviour {
   private void DrawTouchPoint(TouchPoint touchPoint) {
     Vector2 canvasSize = canvas.sizeDelta; // canvasRect.sizeDelta
 
-    float touchX = (-0.5f + touchPoint.coordinates.x) * canvasSize.x / 5f;
-    float touchY = (-0.5f + touchPoint.coordinates.y) * canvasSize.y / 5f;
+    float touchX = (-0.5f + touchPoint.coordinates.x) * canvasSize.x;
+    float touchY = (-0.5f + touchPoint.coordinates.y) * canvasSize.y;
 
     if (!_touchPointsRenderers[touchPoint.id].enabled)
       _touchPointsRenderers[touchPoint.id].enabled = true;

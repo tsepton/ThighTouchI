@@ -11,9 +11,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Demo.unity
     guid: 5356e0065c10e1448acae253a852da83
-  - enabled: 1
-    path: Assets/Scenes/Interaction.unity
+  - enabled: 0
+    path: Assets/Scenes/3D Manipulation.unity
     guid: 83801b9b4d3e70342abe6eb3336b9021
+  - enabled: 0
+    path: Assets/Scenes/Use Case Map.unity
+    guid: 0328497823367704094e67cc2736fd9f
+  - enabled: 1
+    path: Assets/Scenes/Gesture ES.unity
+    guid: 33b098c426e4b6147937b07126c9a422
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: dc5a169419fa04987b057f65238cf3ba, type: 2}

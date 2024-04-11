@@ -39,10 +39,21 @@ public class Touchpad : MonoBehaviour {
 
   private WebSocket _ws;
 
+  private Coroutine _inputHandler;
+
   private void Start() {
     _ws = new WebSocket($"ws://{uri}");
-    _ws.OnOpen += (sender, args) => { Debug.Log("Connected."); };
-    _ws.OnClose += (sender, args) => { Debug.Log("Disconnected."); };
+    
+    _ws.OnOpen += (sender, args) => {
+      Debug.Log("Connected.");
+      _inputHandler = StartCoroutine(SemanticHandler());
+    };
+    
+    _ws.OnClose += (sender, args) => {
+      Debug.Log("Disconnected.");
+      StopCoroutine(_inputHandler);
+    };
+    
     _ws.OnMessage += (sender, e) => {
       var rawData = e.Data.Trim('[', ']').Split(',');
       var data = new int[rawData.Length];
@@ -54,7 +65,6 @@ public class Touchpad : MonoBehaviour {
     };
 
     _ws.Connect();
-    StartCoroutine(SemanticHandler());
   }
 
 
@@ -67,7 +77,7 @@ public class Touchpad : MonoBehaviour {
     var loadIndex = 0;
     while (true) {
       // Performance handling
-      // Max 5 touches per iteration 
+      // Max 5 inputs per iteration 
       if (loadIndex >= 5) {
         loadIndex = 0;
         yield return null;
@@ -80,9 +90,10 @@ public class Touchpad : MonoBehaviour {
       var news = currentPoints?.GetTouchPoints() ?? Array.Empty<TouchPoint>();
       var idsToRemove = new List<int>();
       foreach (var (id, time) in previousPoints.Where(value => !news.Select(t => t.id).Contains(value.Key))) {
-        if (time + 200L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
+        if (time + 50L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
         OnRelease?.Invoke(id);
         idsToRemove.Add(id);
+        firstTouch = true;
       }
       idsToRemove.ForEach(i => previousPoints.Remove(i));
       foreach (var touchPoint in news) {
@@ -98,6 +109,10 @@ public class Touchpad : MonoBehaviour {
       }
 
       if (currentPoints?.Data[0] == null || currentPoints?.Data[1] == null) continue;
+      if (currentPoints.Data[2] != null) { // If more than 2 touchpoints, nothing should happen
+        firstTouch = true;
+        continue;
+      }
 
       var t1 = (TouchPoint)currentPoints.Data[0];
       var t2 = (TouchPoint)currentPoints.Data[1];
@@ -125,7 +140,6 @@ public class Touchpad : MonoBehaviour {
 
       // Translate handling
       // TODO 
-      if (t1.isLast || t2.isLast) firstTouch = true;
     }
   }
 }
