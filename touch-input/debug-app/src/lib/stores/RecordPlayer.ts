@@ -57,13 +57,17 @@ export class CurrentSequence implements PlayableSequence {
 				const coordinatesY = touchPointData[5];
 				const offsetY = touchPointData[4];
 
-				touches.push({
-					// TODO
-					fingerId,
-					x: coordinatesX + offsetX / 256.0,
-					y: coordinatesY + offsetY / 256.0,
-					isBeingTouched
-				});
+				touches.push(
+					this._rotate(
+						{
+							fingerId,
+							x: (coordinatesX + offsetX / 256.0) / 16,
+							y: (coordinatesY + offsetY / 256.0) / 16,
+							isBeingTouched
+						},
+						-90
+					)
+				);
 			}
 			this.currentTouches$.set(touches);
 			this._history.push({ touches, timestamp: Date.now() });
@@ -97,6 +101,16 @@ export class CurrentSequence implements PlayableSequence {
 		);
 		this._recordTimestamp = undefined;
 		return historyToSave;
+	}
+
+	_rotate(touch: Touch, angle: number): Touch {
+		const center = { x: 0.5, y: 0.5 };
+		const radians = (Math.PI / 180) * angle;
+		const cos = Math.cos(radians);
+		const sin = Math.sin(radians);
+		const nx = cos * (touch.x - center.x) + sin * (touch.y - center.y) + center.x;
+		const ny = cos * (touch.y - center.y) - sin * (touch.x - center.x) + center.y;
+		return { ...touch, x: nx, y: ny };
 	}
 }
 

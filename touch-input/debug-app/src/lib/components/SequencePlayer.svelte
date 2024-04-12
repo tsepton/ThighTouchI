@@ -23,7 +23,7 @@
 
 	let readingProgression: number = 0;
 
-	let touchPoints: { fingerId: number; touchX: number; touchY: number }[] = [];
+	let touchPoints: { fingerId: number; x: number; y: number }[] = [];
 
 	let isRecording: boolean = false;
 
@@ -38,6 +38,7 @@
 		(() => {
 			subscriptions.forEach((s) => s());
 			subscriptions = [];
+			touchPoints = [];
 			handleRecordChange();
 		})();
 
@@ -70,8 +71,8 @@
 	) {
 		const cubeWidth = surface.offsetWidth;
 		const cubeHeight = surface.offsetHeight;
-		const touchX = (coordinatesX / 15.0) * cubeWidth;
-		const touchY = (coordinatesY / 15.0) * cubeHeight;
+		const x = coordinatesX * cubeWidth;
+		const y = coordinatesY * cubeHeight;
 
 		const existingTouchPointIndex = touchPoints.findIndex((tp) => tp.fingerId === fingerId);
 		if (!isBeingTouched) {
@@ -80,9 +81,9 @@
 			}
 		} else {
 			if (existingTouchPointIndex === -1) {
-				touchPoints.push({ fingerId, touchX, touchY });
+				touchPoints.push({ fingerId, x, y });
 			} else {
-				touchPoints[existingTouchPointIndex] = { fingerId, touchX, touchY };
+				touchPoints[existingTouchPointIndex] = { fingerId, x, y };
 			}
 		}
 	}
@@ -129,7 +130,7 @@
 		{#each touchPoints as touchPoint}
 			<div
 				class="touch-point-{touchPoint.fingerId}"
-				style="left: {touchPoint.touchX}px; top: {touchPoint.touchY}px;"
+				style="left: {touchPoint.x}px; top: {touchPoint.y}px;"
 			></div>
 		{/each}
 	</div>
@@ -137,7 +138,7 @@
 		{#if !isPlayback && !isRecording}
 			<Popover.Root>
 				<Popover.Trigger asChild let:builder>
-					<Button builders={[builder]}>Record</Button>
+					<Button builders={[builder]} disabled={status !== 'Connected'}>Record</Button>
 				</Popover.Trigger>
 				<Popover.Content>
 					<div class="grid grid-cols-3 items-center">
