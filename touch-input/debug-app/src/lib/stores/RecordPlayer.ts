@@ -7,7 +7,6 @@ import { currentRecord$ } from './CurrentRecord';
 export const currentSequence$: Readable<PlayableSequence> = derived(
 	currentRecord$,
 	($record, set) => {
-		// Transformation logic here
 		let seq: PlayableSequence;
 		if ($record.id === -1) seq = new CurrentSequence();
 		else seq = new PlaybackSequence($record.data!);
@@ -43,12 +42,7 @@ export class CurrentSequence implements PlayableSequence {
 			for (let index = 0; index < event.data.length; index += 6) {
 				const touchPointData = data.slice(index, index + 6);
 				if (touchPointData.length < 6) break;
-				if (
-					touchPointData.reduce(
-						(accumulator: any, currentValue: any) => accumulator + currentValue
-					) === 0
-				)
-					break;
+				if (touchPointData.reduce((acc: number, current: number) => acc + current) === 0) break;
 
 				const isBeingTouched = touchPointData[0] === 7;
 				const fingerId = touchPointData[1];
@@ -130,14 +124,10 @@ export class PlaybackSequence implements PlayableSequence {
 	play(index: number = 0): void {
 		this.status$.set('Playing.');
 		const toPlay = this._history[index];
-		this.currentTouches$.set(toPlay.touches); // TODO  +1 on each call + delay call
-		// TODO timeout should be based upon the diff between timestamps
+		this.currentTouches$.set(toPlay.touches);
 		if (index == this._history.length - 1) setTimeout(() => this.play(0), 2000);
 		else
-			setTimeout(
-				() => this.play(index + 1),
-				(toPlay.timestamp - this._history[index + 1].timestamp) * 1000
-			);
+			setTimeout(() => this.play(index + 1), toPlay.timestamp - this._history[index + 1].timestamp);
 		this.readingProgression$.set((index / this._history.length) * 100);
 	}
 }

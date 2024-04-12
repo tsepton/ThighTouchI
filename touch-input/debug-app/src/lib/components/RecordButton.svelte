@@ -9,6 +9,8 @@
 
 	export let record: Record;
 
+	export let status: string;
+
 	let isRecording: boolean = false;
 
 	function startRecord() {

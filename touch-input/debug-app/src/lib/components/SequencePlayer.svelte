@@ -53,7 +53,7 @@
 	<Surface {record}></Surface>
 	<div class="mt-8 flex justify-center">
 		{#if !isPlayback}
-			<RecordButton {record}></RecordButton>
+			<RecordButton {record} {status}></RecordButton>
 		{:else}
 			<Progress value={readingProgression} />
 		{/if}
