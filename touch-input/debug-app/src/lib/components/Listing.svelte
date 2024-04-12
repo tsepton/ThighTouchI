@@ -41,7 +41,7 @@
 				{
 					id: recordings.length,
 					name: file.name,
-					date: file.lastModified,
+					date: new Date(file.lastModified),
 					data: JSON.parse(reader.result as string)
 				}
 			];
