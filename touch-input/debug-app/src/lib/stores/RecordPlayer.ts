@@ -21,21 +21,28 @@ export interface PlayableSequence {
 }
 
 export class CurrentSequence implements PlayableSequence {
-	status$: Writable<string> = writable('Connecting...');
+	status$: Writable<string> = writable('No ip address');
 	currentTouches$: Writable<Touch[]> = writable([]);
 
 	_history: TouchSequence[] = [];
 	_recordTimestamp: number | undefined = 0;
-	_socket: WebSocket;
+	_socket: WebSocket | undefined;
+	_timeout: number | undefined;
 
 	constructor() {
 		if (!browser) throw new Error('This class can only be used in the browser.');
+	}
 
-		this._socket = new WebSocket('ws://192.168.0.152:8001/ws');
+	connect(ip: string): void {
+
+		this._socket?.close();
+		this._socket = new WebSocket( `ws://${ip}/ws`);
+		this.status$.set('Connecting...');
 
 		this._socket.addEventListener('message', (event) => {
-			const data = JSON.parse(event.data);
+			if (this._timeout) clearTimeout(this._timeout);
 
+			const data = JSON.parse(event.data);
 			data.shift(); // Remove the first element, which indicates that it is being touched.
 
 			const touches: Touch[] = [];
@@ -65,11 +72,15 @@ export class CurrentSequence implements PlayableSequence {
 			}
 			this.currentTouches$.set(touches);
 			this._history.push({ touches, timestamp: Date.now() });
+			this._timeout = setTimeout(() => {
+				this._history.push({ touches: [], timestamp: Date.now() });
+				this.currentTouches$.set([])
+			}, 100); 
 		});
 
 		this._socket.addEventListener('open', () => {
 			console.log('WebSocket connection established.');
-			this.status$.set('Connected');
+			this.status$.set('Connected.');
 		});
 
 		this._socket.addEventListener('close', () => {

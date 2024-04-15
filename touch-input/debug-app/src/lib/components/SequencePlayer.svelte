@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { PlaybackSequence, currentSequence$ } from '$lib/stores/RecordPlayer';
+	import { CurrentSequence, PlaybackSequence, currentSequence$ } from '$lib/stores/RecordPlayer';
 	import type { Record } from '$lib/types/Record';
-	import { type Unsubscriber } from 'svelte/store';
+	import { get, type Unsubscriber } from 'svelte/store';
 	import RecordButton from './RecordButton.svelte';
 	import Surface from './Surface.svelte';
 	import Progress from './ui/progress/progress.svelte';
+	import { Button } from './ui/button';
+	import { Input } from './ui/input';
 
 	export let className: string = '';
 
@@ -15,6 +17,8 @@
 	let readingProgression: number = 0;
 
 	let isPlayback: boolean = false;
+
+	let ipAddress: string = '192.168.0.152:8001';
 
 	let subscriptions: Unsubscriber[] = [];
 
@@ -39,6 +43,10 @@
 			})
 		);
 	}
+
+	function connect() {
+		(get(currentSequence$) as CurrentSequence).connect(ipAddress);
+	}
 </script>
 
 <div class="container {className}">
@@ -49,11 +57,18 @@
 	<div>
 		<small>{status}</small>
 	</div>
-
 	<Surface {record}></Surface>
 	<div class="mt-8 flex justify-center">
 		{#if !isPlayback}
-			<RecordButton {record} {status}></RecordButton>
+			<div class="flex w-full flex-row justify-between gap-5">
+				<form class="flex w-full max-w-sm items-center space-x-2">
+					<Input type="text" value={ipAddress} />
+					<Button on:click={connect} variant="outline" disabled={ipAddress.length === 0}>
+						Connect
+					</Button>
+				</form>
+				<RecordButton {record} {status}></RecordButton>
+			</div>
 		{:else}
 			<Progress value={readingProgression} />
 		{/if}

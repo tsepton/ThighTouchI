@@ -2,6 +2,7 @@
 	import { currentSequence$ } from '$lib/stores/RecordPlayer';
 	import type { Record } from '$lib/types/Record';
 	import type { Unsubscriber } from 'svelte/store';
+	import type { Touch } from '$lib/types/Record';
 
 	export let touchPoints: { fingerId: number; x: number; y: number }[] = [];
 
@@ -25,39 +26,18 @@
 		subscriptions.push(
 			currentSequence$.subscribe((seq) => {
 				subscriptions.push(
-					seq.currentTouches$.subscribe((touches) =>
-						touches.forEach((touch) => {
-							drawFinger(touch.fingerId, touch.x, touch.y, touch.isBeingTouched);
-						})
-					)
+					seq.currentTouches$.subscribe((touches) => (touchPoints = touches.map(transformCoord)))
 				);
 			})
 		);
 	}
 
-	function drawFinger(
-		fingerId: number,
-		coordinatesX: number,
-		coordinatesY: number,
-		isBeingTouched: boolean
-	) {
+	function transformCoord(touch: Touch) {
 		const cubeWidth = surface.offsetWidth;
 		const cubeHeight = surface.offsetHeight;
-		const x = coordinatesX * cubeWidth;
-		const y = coordinatesY * cubeHeight;
-
-		const existingTouchPointIndex = touchPoints.findIndex((tp) => tp.fingerId === fingerId);
-		if (!isBeingTouched) {
-			if (existingTouchPointIndex !== -1) {
-				touchPoints.splice(existingTouchPointIndex, 1);
-			}
-		} else {
-			if (existingTouchPointIndex === -1) {
-				touchPoints.push({ fingerId, x, y });
-			} else {
-				touchPoints[existingTouchPointIndex] = { fingerId, x, y };
-			}
-		}
+		const x = touch.x * cubeWidth;
+		const y = touch.y * cubeHeight;
+		return { ...touch, x, y };
 	}
 </script>
 
@@ -78,7 +58,6 @@
 		height: 70vh;
 		background-color: rgba(255, 255, 255, 0.8);
 		border-radius: 2px;
-		transition: opacity 0.5s;
 		position: relative;
 		box-shadow: none;
 	}
@@ -89,6 +68,5 @@
 		height: 10px;
 		background-color: #312f2f;
 		border-radius: 50%;
-		transition: all 0.2s linear;
 	}
 </style>
