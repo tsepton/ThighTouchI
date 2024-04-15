@@ -31,7 +31,7 @@ export class CurrentSequence implements PlayableSequence {
 	constructor() {
 		if (!browser) throw new Error('This class can only be used in the browser.');
 
-		this._socket = new WebSocket('ws://192.168.0.148:8001/ws');
+		this._socket = new WebSocket('ws://192.168.0.152:8001/ws');
 
 		this._socket.addEventListener('message', (event) => {
 			const data = JSON.parse(event.data);
@@ -127,7 +127,8 @@ export class PlaybackSequence implements PlayableSequence {
 		this.currentTouches$.set(toPlay.touches);
 		if (index == this._history.length - 1) setTimeout(() => this.play(0), 2000);
 		else
-			setTimeout(() => this.play(index + 1), toPlay.timestamp - this._history[index + 1].timestamp);
+			setTimeout(() => this.play(index + 1), (this._history[index + 1].timestamp - toPlay.timestamp));
+		
 		this.readingProgression$.set((index / this._history.length) * 100);
 	}
 }

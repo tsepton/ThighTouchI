@@ -83,16 +83,12 @@
 		box-shadow: none;
 	}
 
-	.hidden {
-		visibility: hidden;
-		opacity: 0;
-	}
-
 	[class^='touch-point-'] {
 		position: absolute;
 		width: 10px;
 		height: 10px;
 		background-color: #312f2f;
 		border-radius: 50%;
+		transition: all 0.2s linear;
 	}
 </style>
