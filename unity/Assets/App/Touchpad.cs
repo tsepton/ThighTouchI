@@ -90,7 +90,7 @@ public class Touchpad : MonoBehaviour {
       var news = currentPoints?.GetTouchPoints() ?? Array.Empty<TouchPoint>();
       var idsToRemove = new List<int>();
       foreach (var (id, time) in previousPoints.Where(value => !news.Select(t => t.id).Contains(value.Key))) {
-        if (time + 500L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
+        if (time + 300L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
         OnRelease?.Invoke(id);
         idsToRemove.Add(id);
         firstTouch = true;

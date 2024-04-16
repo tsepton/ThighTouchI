@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class CarMenuInteraction : GazeSelector {
+public class RadialMenu : GazeSelector {
   [SerializeField] public GameObject reducer;
 
   [SerializeField] public GameObject menu;
@@ -20,9 +20,7 @@ public class CarMenuInteraction : GazeSelector {
   private RectTransform _canvasRect;
 
   private Vector2 _touchStartPos;
-
-  private Collider _selectedMenuItem;
-
+  
   private Cursor _menuCursor;
 
   private RectTransform _menuCursorRect;
@@ -60,13 +58,14 @@ public class CarMenuInteraction : GazeSelector {
 
   private void OnRelease(int touchId) {
     if (touchId != 1) return;
+    
+    if (_menuCursor.Selection != null) {
+      _menuCursor.Selection.GetComponent<Renderer>().material.color = Color.grey;
+      _menuCursor.Selection.GetComponent<MenuOption>().invokeHandler.Invoke();
+    }
+    reducer.SetActive(true);
+    menu.SetActive(false);
 
-    if (_selectedMenuItem == null) {
-      reducer.SetActive(true);
-      menu.SetActive(false);
-    } // TODO -> Execute the linked action
-
-    if (_menuCursor.Selection != null) _menuCursor.Selection.GetComponent<Renderer>().material.color = Color.grey;
   }
 
   private void UpdateMaterial([CanBeNull] GameObject newGo, [CanBeNull] GameObject oldGo) {
