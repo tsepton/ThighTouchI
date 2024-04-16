@@ -34,8 +34,5 @@ public class ThreeDimensionManipulation : GazeSelector {
     var growth = -1 + (float)Math.Pow(1 - velocity, -delta);
     base.Selection.transform.localScale += new Vector3(growth, growth, growth);
   }
-
-  public void SetSelection(GameObject go) {
-    base.Selection = go;
-  }
+  
 }
