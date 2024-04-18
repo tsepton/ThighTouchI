@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class RearMenu : MonoBehaviour
-{
+public class RearMenu : MonoBehaviour {
+
+    [SerializeField] private GameObject projection;
     
 
     // Start is called before the first frame update
@@ -21,7 +22,11 @@ public class RearMenu : MonoBehaviour
     }
 
     public void OpenRearCamera() {
-        Debug.Log("Open camera todo");
+        projection.SetActive(true);
+    }
+
+    public void CloseRearCamera() {
+        projection.SetActive(false);
     }
 
 }
