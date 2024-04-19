@@ -100,7 +100,6 @@ public class Touchpad : MonoBehaviour {
         previousPoints[touchPoint.id] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
       }
 
-
       // Touch handling
       for (var i = 0; i < 10; i++) {
         var currentP = currentPoints?.Data[i];

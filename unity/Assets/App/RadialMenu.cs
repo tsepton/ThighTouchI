@@ -8,12 +8,14 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class RadialMenu : GazeSelector {
+public class RadialMenu : MonoBehaviour {
   [SerializeField] public GameObject reducer;
 
   [SerializeField] public GameObject menu;
 
   [SerializeField] public GameObject menuCursor;
+
+  [SerializeField] public GazeThighSelector gazeThigh;
 
   private Canvas _canvas;
 
@@ -46,10 +48,12 @@ public class RadialMenu : GazeSelector {
   }
 
   private void OnTouch(TouchPoint touch) {
-    if (Selection == null && menu.activeSelf) {
-      _menuCursorRect.anchoredPosition = (touch.coordinates - _touchStartPos) * 500;
+    if (touch.id != 1) return;
+
+    if (gazeThigh.selection != null && gazeThigh.selection.gameObject == menu) {
+      _menuCursorRect.anchoredPosition = (touch.coordinates - _touchStartPos) * 400;
     }
-    else if (Selection != null && Selection.gameObject == reducer && !menu.activeSelf) {
+    else if (gazeThigh.selection != null && gazeThigh.selection.gameObject == reducer && !menu.activeSelf) {
       _touchStartPos = touch.coordinates;
       reducer.SetActive(false);
       menu.SetActive(true);
