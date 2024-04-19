@@ -2286,7 +2286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885ddc96264a6774cba2450a8f3a1188, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uri: 192.168.0.148:8001/ws
+  uri: 192.168.0.152:8001/ws
 --- !u!114 &6572339598964084295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2355,6 +2355,7 @@ MonoBehaviour:
   objectToMove: {fileID: 637808727}
   canvas: {fileID: 1514266900046387876}
   implementation: {fileID: 246741497}
+  informationGuide: {fileID: 0}
 --- !u!1 &6937027817906478173
 GameObject:
   m_ObjectHideFlags: 0
