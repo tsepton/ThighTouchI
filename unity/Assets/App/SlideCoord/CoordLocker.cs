@@ -11,7 +11,8 @@ public class CoordSlideLocker : MonoBehaviour
     public GameObject sphereLock2;
     public GameObject sphereLock3;
 
-    public 
+    
+    public GameObject informationGuide; 
     //tets
     // Start is called before the first frame update
     void Start()
@@ -42,6 +43,7 @@ public class CoordSlideLocker : MonoBehaviour
             if (sphere1IsGreen && sphere2IsGreen && sphere3IsGreen )
             {
                 // Changer les canvas
+                informationGuide.SetActive(false);
                 Canvas_lock1.SetActive(false);
                 Canvas.SetActive(true);
                 locker = false; 

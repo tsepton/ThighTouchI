@@ -10,6 +10,8 @@ public class ObjectMoverCondCoord : MonoBehaviour
 
     public GameObject implementation;
 
+    public GameObject informationGuide;
+
     // Booléen pour suivre si le déplacement a déjà eu lieu
     private bool hasMoved = false;
 
@@ -32,7 +34,7 @@ public class ObjectMoverCondCoord : MonoBehaviour
         { 
             // Activer l'objet à déplacer
             
-            
+            informationGuide.SetActive(false);
             Vector2 canvasSize = canvas.sizeDelta;
             
             float touchX = (-0.5f + touchPoint.coordinates.x) * canvasSize.x / 5f;
@@ -56,6 +58,7 @@ public class ObjectMoverCondCoord : MonoBehaviour
             {
                 lockSphere.isGreen = false;
             }
+            informationGuide.SetActive(true);
             objectToMove.SetActive(false);
             hasMoved = false;
               

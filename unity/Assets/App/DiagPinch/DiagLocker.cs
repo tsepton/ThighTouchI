@@ -1,17 +1,17 @@
 using System.Collections;
 using UnityEngine;
 
-public class SlideLocker : MonoBehaviour
+public class DiagLocker : MonoBehaviour
 {
     public GameObject Canvas_lock1;
     public GameObject Canvas_lock2;
-    public GameObject Canvas_lock3;
+   
     public GameObject Canvas;
 
     // Références aux sphères
     public GameObject sphereLock1;
     public GameObject sphereLock2;
-    public GameObject sphereLock3;
+   
 
     public GameObject informationGuide;
 
@@ -38,16 +38,16 @@ public class SlideLocker : MonoBehaviour
             // Vérifier l'état des sphères
             bool sphere1IsGreen = sphereLock1.GetComponent<LockSphere1>().isGreen;
             bool sphere2IsGreen = sphereLock2.GetComponent<LockSphere1>().isGreen;
-            bool sphere3IsGreen = sphereLock3.GetComponent<LockSphere1>().isGreen;
+            
 
             // Si toutes les sphères sont vertes, changer les canvas
-            if (sphere1IsGreen && sphere2IsGreen && sphere3IsGreen)
+            if (sphere1IsGreen && sphere2IsGreen)
             {
                 // Changer les canvas
                 informationGuide.SetActive(false);
                 Canvas_lock1.SetActive(false);
                 Canvas_lock2.SetActive(false);
-                Canvas_lock3.SetActive(false);
+            
                 Canvas.SetActive(true);
                 locker = false; 
                 GetComponent<SlideObjectMover>().enabled = false;
