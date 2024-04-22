@@ -21,7 +21,8 @@ public class ProjectionControls : MonoBehaviour {
   private TouchPoint? _initTouchPoint;
   
   private void OnEnable() {
-    Touchpad.OnTouch += OnScaleOneTouch;
+    // FIXME once interface is rewritten
+    Touchpad.OnOneTouch += OnScaleOneTouch;
     Touchpad.OnRelease += OnRelease;
     Touchpad.OnScale += OnScale;
   }
@@ -45,6 +46,7 @@ public class ProjectionControls : MonoBehaviour {
       if (distance.y > 0 && current.y >= maximumAngle) return;
       if (distance.y < 0 && current.y <= minimumAngle) return;
       camera.gameObject.transform.Rotate(new Vector3(0, 1, 0), distance.y);
+      _initTouchPoint = touchpoint;
     }
   }
 
@@ -57,5 +59,6 @@ public class ProjectionControls : MonoBehaviour {
     var growth = Math.Abs(delta) * 100;
     var fov = Mathf.MoveTowards(camera.fieldOfView, delta > 0 ? minimumFov : maximumFov, growth);
     camera.fieldOfView = fov;
+    _initTouchPoint = null; // this ensures that no rotation is done when user release one finger 
   }
 }

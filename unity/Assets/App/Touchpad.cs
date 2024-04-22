@@ -10,11 +10,17 @@ public class Touchpad : MonoBehaviour {
   /// ////////////////////////////////////
   /// /// //////////// API ///////////////  
   /// ////////////////////////////////////
+  // THIS NEEDS SOME REFACTORING...
   public string uri;
 
   public delegate void Touch(TouchPoint t);
 
   public static event Touch OnTouch;
+
+  // FIXME - THIS IS TEMPORARY 
+  public delegate void OneTouch(TouchPoint t);
+
+  public static event OneTouch OnOneTouch;
 
   public delegate void Release(int touchPointId);
 
@@ -90,7 +96,7 @@ public class Touchpad : MonoBehaviour {
       var news = currentPoints?.GetTouchPoints() ?? Array.Empty<TouchPoint>();
       var idsToRemove = new List<int>();
       foreach (var (id, time) in previousPoints.Where(value => !news.Select(t => t.id).Contains(value.Key))) {
-        if (time + 300L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
+        if (time + 50L > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()) continue;
         OnRelease?.Invoke(id);
         idsToRemove.Add(id);
         firstTouch = true;
@@ -107,6 +113,10 @@ public class Touchpad : MonoBehaviour {
         OnTouch?.Invoke((TouchPoint)currentP);
       }
 
+      // FIXME - This is temporary - this entire interface shall be refactored
+      if (currentPoints?.Data[0] != null && currentPoints?.Data[1] == null) {
+        OnOneTouch?.Invoke((TouchPoint)currentPoints.Data[0]);
+      }
       if (currentPoints?.Data[0] == null || currentPoints?.Data[1] == null) continue;
       if (currentPoints.Data[2] != null) { // If more than 2 touchpoints, nothing should happen
         firstTouch = true;

@@ -486,7 +486,6 @@ MonoBehaviour:
   scaleSpeed: 0.1
   maxScale: 0.3
   minScale: 0.2
-  _isBeingLookedAt: 0
 --- !u!1 &247883983
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,7 +869,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 3faa5ebf3c7a3ab4b8c2fd15eea485b1, type: 3}
+  m_Texture: {fileID: 2800000, guid: 96602ba3dc788764c8582aa06bf47325, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1414,7 +1413,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 3faa5ebf3c7a3ab4b8c2fd15eea485b1, type: 3}
+  m_Texture: {fileID: 2800000, guid: 96602ba3dc788764c8582aa06bf47325, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1800,7 +1799,6 @@ MonoBehaviour:
   scaleSpeed: 0.1
   maxScale: 0.3
   minScale: 0.2
-  _isBeingLookedAt: 0
 --- !u!1 &885167005 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5605446239314028814, guid: d71574bb2a01f3e48a1f36069c3652c2, type: 3}
@@ -1822,7 +1820,6 @@ MonoBehaviour:
   scaleSpeed: 0.1
   maxScale: 0.3
   minScale: 0.2
-  _isBeingLookedAt: 0
 --- !u!1 &890367079
 GameObject:
   m_ObjectHideFlags: 0
