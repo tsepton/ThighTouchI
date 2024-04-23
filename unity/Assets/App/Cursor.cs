@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -28,6 +29,10 @@ public class Cursor : MonoBehaviour {
   }
 
   private void OnTriggerExit(Collider other) {
+    Selection = null;
+  }
+
+  private void OnDisable() {
     Selection = null;
   }
 }

@@ -34,7 +34,7 @@ public class RadialMenu : MonoBehaviour {
     _canvas = menu.GetComponentInChildren<Canvas>();
     _canvasRect = menu.GetComponentInChildren<RectTransform>();
 
-    _menuCursor = menuCursor.GetComponent<Cursor>();
+    _menuCursor = menuCursor.GetComponentInChildren<Cursor>();
     _menuCursorRect = menuCursor.GetComponentInChildren<RectTransform>();
 
     _menuCursor.OnSelectionUpdate += UpdateMaterial;
@@ -64,12 +64,12 @@ public class RadialMenu : MonoBehaviour {
     if (touchId != 1) return;
     
     if (_menuCursor.Selection != null) {
+      Debug.Log(gameObject.name);
       _menuCursor.Selection.GetComponent<Renderer>().material.color = Color.grey;
       _menuCursor.Selection.GetComponent<MenuOption>().invokeHandler.Invoke();
     }
     reducer.SetActive(true);
     menu.SetActive(false);
-
   }
 
   private void UpdateMaterial([CanBeNull] GameObject newGo, [CanBeNull] GameObject oldGo) {
