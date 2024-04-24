@@ -39,10 +39,12 @@ public class GazeThighSelector : MonoBehaviour {
 
   private void OnSelectExited(SelectExitEventArgs args) {
     _selection = null;
+    if (!_isTouching) selection = _selection;
   }
 
   private void OnHoverExited(HoverExitEventArgs args) {
     _selection = null;
+    if (!_isTouching) selection = _selection;
   }
 
   private void OnTouch(TouchPoint _) {
