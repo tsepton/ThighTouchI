@@ -17,16 +17,15 @@ public class DemoMenu : MonoBehaviour {
         NextStep();
     }
 
-    public void OpenCamera() {
-        projection.SetActive(true);
+    public void TriggerCamera() {
+        projection.SetActive(!projection.activeSelf);
     }
-
-    public void CloseCamera() {
-        projection.SetActive(false);
+    
+    public void TriggerObjectVisibility(GameObject go) {
+        go.SetActive(!go.activeSelf);
     }
-
+    
     public void NextStep() {
-        Debug.Log("NextStep");
         step1.SetActive(_nextStepIndex == 1);
         step2.SetActive(_nextStepIndex == 2);
         step3.SetActive(_nextStepIndex == 3);

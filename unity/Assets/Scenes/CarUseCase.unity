@@ -483,8 +483,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gazeThigh: {fileID: 1096604030}
-  scaleSpeed: 0.1
-  maxScale: 0.3
+  scaleSpeed: 0.5
+  maxScale: 0.4
   minScale: 0.2
 --- !u!1 &247883983
 GameObject:
@@ -1823,8 +1823,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gazeThigh: {fileID: 1096604030}
-  scaleSpeed: 0.1
-  maxScale: 0.3
+  scaleSpeed: 0.5
+  maxScale: 0.4
   minScale: 0.2
 --- !u!1 &890367079
 GameObject:
@@ -1985,6 +1985,10 @@ PrefabInstance:
     - target: {fileID: 2694154322508310077, guid: d71574bb2a01f3e48a1f36069c3652c2, type: 3}
       propertyPath: m_Name
       value: RearMenu Center
+      objectReference: {fileID: 0}
+    - target: {fileID: 2694154322508310077, guid: d71574bb2a01f3e48a1f36069c3652c2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2858965480971485342, guid: d71574bb2a01f3e48a1f36069c3652c2, type: 3}
       propertyPath: m_SizeDelta.x
@@ -2240,7 +2244,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 938244803}
         m_TargetAssemblyTypeName: RearMenu, Assembly-CSharp
-        m_MethodName: OpenRearCamera
+        m_MethodName: TriggerRearCamera
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3059,7 +3063,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Open Camera
+  m_text: 'Camera
+
+    on/off'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3273,19 +3279,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   invokeHandler:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1374361770}
-        m_TargetAssemblyTypeName: RearMenu, Assembly-CSharp
-        m_MethodName: CloseRearCamera
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &1244291549
 GameObject:
   m_ObjectHideFlags: 0
@@ -3730,7 +3724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2395795033295642848, guid: d71574bb2a01f3e48a1f36069c3652c2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2694154322508310077, guid: d71574bb2a01f3e48a1f36069c3652c2, type: 3}
       propertyPath: m_Name
@@ -3913,7 +3907,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1374361770}
         m_TargetAssemblyTypeName: RearMenu, Assembly-CSharp
-        m_MethodName: OpenRearCamera
+        m_MethodName: TriggerRearCamera
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6276,6 +6270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uri: 192.168.0.152:8001/ws
+  status: Connecting...
 --- !u!114 &6572339598964084295
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,25 +8,8 @@ public class RearMenu : MonoBehaviour {
 
     [SerializeField] private GameObject projection;
     
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public void OpenRearCamera() {
-        projection.SetActive(true);
-    }
-
-    public void CloseRearCamera() {
-        projection.SetActive(false);
+    public void TriggerRearCamera() {
+        projection.SetActive(!projection.activeSelf);
     }
 
 }

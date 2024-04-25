@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using WebSocketSharp;
@@ -11,7 +13,13 @@ public class Touchpad : MonoBehaviour {
   /// /// //////////// API ///////////////  
   /// ////////////////////////////////////
   // THIS NEEDS SOME REFACTORING...
-  public string uri;
+  [SerializeField] public string uri;
+
+  [DoNotSerialize] public string status = "Connecting...";
+  
+  public delegate void ConnectionStatusUpdate(string status);
+
+  public static event ConnectionStatusUpdate OnConnectionStatusUpdate;
 
   public delegate void Touch(TouchPoint t);
 
@@ -53,11 +61,15 @@ public class Touchpad : MonoBehaviour {
     _ws.OnOpen += (sender, args) => {
       Debug.Log("Connected.");
       _inputHandler = StartCoroutine(SemanticHandler());
+      status = "Connected.";
+      OnConnectionStatusUpdate?.Invoke(status);
     };
     
     _ws.OnClose += (sender, args) => {
       Debug.Log("Disconnected.");
       StopCoroutine(_inputHandler);
+      status = "Disconnected.";
+      OnConnectionStatusUpdate?.Invoke(status);
     };
     
     _ws.OnMessage += (sender, e) => {
