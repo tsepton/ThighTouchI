@@ -39,9 +39,9 @@
 	"dependencies": {
 		"bits-ui": "^0.21.2",
 		"clsx": "^2.1.0",
-		"heatmap.js": "^2.0.5",
 		"lucide-svelte": "^0.367.0",
 		"tailwind-merge": "^2.2.2",
-		"tailwind-variants": "^0.2.1"
+		"tailwind-variants": "^0.2.1",
+		"visual-heatmap": "^2.1.0"
 	}
 }
