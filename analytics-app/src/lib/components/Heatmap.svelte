@@ -17,7 +17,7 @@
 	function updateHeatmap(): any {
 		heatmap?.clear();
 		heatmap = Heatmap('.surface', {
-			size: 20.0,
+			size: 15.0,
 			max: 1,
 			min: 0,
 			intensity: 1.0,
@@ -52,7 +52,7 @@
 		canvas.width = canvas.offsetWidth;
 		canvas.height = canvas.offsetHeight;
 		const data = record.data
-			?.flatMap((data) => data.touches.map((touch) => ({ x: touch.x, y: touch.y, value: 0.15 })))
+			?.flatMap((data) => data.touches.map((touch) => ({ x: touch.x, y: touch.y, value: 0.05 })))
 			.map((elem) => ({ ...elem, x: elem.x * canvas.width, y: elem.y * canvas.height }));
 
 		heatmap.clear();
