@@ -86,6 +86,5 @@
 		max-width: max-content;
 		min-width: fit-content;
 		max-height: 100%;
-		overflow-x: scroll;
 	}
 </style>
