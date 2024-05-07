@@ -2,11 +2,12 @@
 	import { CurrentSequence, PlaybackSequence, currentSequence$ } from '$lib/stores/RecordPlayer';
 	import type { Record } from '$lib/types/Record';
 	import { get, type Unsubscriber } from 'svelte/store';
+	import Heatmap from './Heatmap.svelte';
 	import RecordButton from './RecordButton.svelte';
 	import Surface from './Surface.svelte';
-	import Progress from './ui/progress/progress.svelte';
 	import { Button } from './ui/button';
 	import { Input } from './ui/input';
+	import Progress from './ui/progress/progress.svelte';
 
 	export let className: string = '';
 
@@ -57,22 +58,26 @@
 	<div>
 		<small>{status}</small>
 	</div>
-	<Surface {record}></Surface>
-	<div class="mt-8 flex justify-center">
-		{#if !isPlayback}
-			<div class="flex w-full flex-row justify-between gap-5">
-				<form class="flex w-full max-w-sm items-center space-x-2">
-					<Input type="text" value={ipAddress} />
-					<Button on:click={connect} variant="outline" disabled={ipAddress.length === 0}>
-						Connect
-					</Button>
-				</form>
-				<RecordButton {record} {status}></RecordButton>
-			</div>
-		{:else}
-			<Progress value={readingProgression} />
-		{/if}
+	{#if !isPlayback}
+		<Surface {record}></Surface>
+		<div class="flex w-full flex-row justify-between gap-5 mt-8 flex justify-center">
+			<form class="flex w-full max-w-sm items-center space-x-2">
+				<Input type="text" value={ipAddress} />
+				<Button on:click={connect} variant="outline" disabled={ipAddress.length === 0}>
+					Connect
+				</Button>
+			</form>
+			<RecordButton {record} {status}></RecordButton>
+		</div>
+	{:else}
+	<div class="flex justify-center gap-5">
+		<div>
+			<Surface {record}></Surface>
+			<Progress class="my-8 flex justify-center" value={readingProgression} />
+		</div>
+		<Heatmap {record}></Heatmap>
 	</div>
+	{/if}
 </div>
 
 <style>
@@ -81,5 +86,6 @@
 		max-width: max-content;
 		min-width: fit-content;
 		max-height: 100%;
+		overflow-x: scroll;
 	}
 </style>

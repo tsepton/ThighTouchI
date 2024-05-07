@@ -92,6 +92,8 @@
 		flex-direction: column;
 		gap: 3rem;
 		height: 100%;
+		width: fit-content;
+		min-width: 25vw;
 	}
 
 	#hidden-file-input {

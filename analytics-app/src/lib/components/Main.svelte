@@ -23,7 +23,8 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		width: 100vw;
+		min-width: fit-content;
+		width: min-content;
 		height: 100vh;
 		gap: 2rem;
 		padding: 2rem;

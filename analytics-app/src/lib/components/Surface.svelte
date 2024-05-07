@@ -2,7 +2,6 @@
 	import { currentSequence$ } from '$lib/stores/RecordPlayer';
 	import type { Record } from '$lib/types/Record';
 	import type { Unsubscriber } from 'svelte/store';
-	import type { Touch } from '$lib/types/Record';
 
 	export let touchPoints: { fingerId: number; x: number; y: number }[] = [];
 
@@ -12,32 +11,23 @@
 
 	export let record: Record;
 
-	$: record,
-		(() => {
-			subscriptions.forEach((s) => s());
-			subscriptions = [];
-			touchPoints = [];
-			handleRecordChange();
-		})();
+	$: record, !!surface && init();
 
 	// https://www.retinasocal.com/3d-images/burning-eyes-general.jpg
 	// FIXME - refactor
 	function handleRecordChange(): void {
 		subscriptions.push(
 			currentSequence$.subscribe((seq) => {
-				subscriptions.push(
-					seq.currentTouches$.subscribe((touches) => (touchPoints = touches.map(transformCoord)))
-				);
+				subscriptions.push(seq.currentTouches$.subscribe((touches) => (touchPoints = touches)));
 			})
 		);
 	}
 
-	function transformCoord(touch: Touch) {
-		const cubeWidth = surface.offsetWidth;
-		const cubeHeight = surface.offsetHeight;
-		const x = touch.x * cubeWidth;
-		const y = touch.y * cubeHeight;
-		return { ...touch, x, y };
+	function init() {
+		subscriptions.forEach((s) => s());
+		subscriptions = [];
+		touchPoints = [];
+		handleRecordChange();
 	}
 </script>
 
@@ -45,7 +35,8 @@
 	{#each touchPoints as touchPoint}
 		<div
 			class="touch-point-{touchPoint.fingerId}"
-			style="left: {touchPoint.x}px; top: {touchPoint.y}px;"
+			style="left: {touchPoint.x * surface.offsetWidth}px; 
+			top: {touchPoint.y * surface.offsetHeight}px;"
 		></div>
 	{/each}
 </div>
@@ -61,7 +52,7 @@
 		position: relative;
 		box-shadow: none;
 	}
-
+	
 	[class^='touch-point-'] {
 		position: absolute;
 		width: 10px;
