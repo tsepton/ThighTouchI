@@ -15,7 +15,7 @@
 	let isMounted: boolean = false;
 
 	function updateHeatmap(): any {
-		heatmap?.clearData();
+		heatmap?.clear();
 		heatmap = Heatmap('.surface', {
 			size: 20.0,
 			max: 1,
@@ -54,6 +54,8 @@
 		const data = record.data
 			?.flatMap((data) => data.touches.map((touch) => ({ x: touch.x, y: touch.y, value: 0.15 })))
 			.map((elem) => ({ ...elem, x: elem.x * canvas.width, y: elem.y * canvas.height }));
+
+		heatmap.clear();
 		heatmap.renderData(data ?? []);
 	}
 
