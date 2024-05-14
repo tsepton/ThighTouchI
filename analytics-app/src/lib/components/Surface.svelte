@@ -47,7 +47,7 @@
 		margin-top: 1rem;
 		width: calc(70vh * 9 / 16); /* 16:9 aspect ratio */
 		height: 70vh;
-		background-color: rgba(255, 255, 255, 0.8);
+		background-color: rgba(255, 255, 255, 1);
 		border-radius: 2px;
 		position: relative;
 		box-shadow: none;

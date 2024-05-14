@@ -6,14 +6,14 @@ TODO - device description
 
 ### Setting up the raspberrypi
 
-Install the required dependencies system wide on the raspberry and configure it to boot on CLI with no password to login.
+Install the required dependencies system wide on the raspberry pi and configure it to boot on CLI with no password to login.
 
 ```bash
 sudo apt install python3-hid python3-aiohttp python3-asyncio
-sudo raspi-config # Make sure to select the CLI+no-password option. 
+sudo raspi-config # Make sure to select the 'CLI+no-password' option. 
 ```
 
-Make the project boot on startup. Make sure the raspberrypi connects itself to your local network with a fixed IP. 
+Make the project boot on startup and that the raspberry pi connects itself to your local network with a fixed IP. 
 
 ```bash
 echo "\n\n\n" >> ~/.bashrc
