@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elicitation control page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        button {
+            padding: 1em;
+            font-size: large;
+            cursor: pointer;
+            width: 20em;
+            margin: 3em;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="sendRequest('previous')">Previous</button>
+    <button onclick="sendRequest('next')">Next</button>
+
+    <script>
+        function sendRequest(action) {
+            const xhr = new XMLHttpRequest();
+            const url = `/${action}/`;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>
