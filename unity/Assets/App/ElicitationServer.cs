@@ -8,16 +8,19 @@ using System.IO;
 using System.Linq;
 
 public class ElicitationServer : MonoBehaviour {
+
+  public TextAsset htmlFile;
+
+  private byte[] fileBytes;
   private HttpListener listener;
   private Thread listenerThread;
   private bool isRunning;
-
   private List<GameObject> elicitationSample = new();
   private int currentElicitationIndex = -1;
-
   private readonly Queue<Action> executionQueue = new();
 
   void Start() {
+    fileBytes = htmlFile.bytes;
     StartServer();
     InitElicitation();
   }
@@ -96,13 +99,9 @@ public class ElicitationServer : MonoBehaviour {
   }
 
   private void HandleGetRequest(HttpListenerContext context) {
-    string filePath = Path.Combine(Application.dataPath, "App/index.html");
-    string responseString = File.Exists(filePath) ? File.ReadAllText(filePath) : "<html><body>Error</body></html>";
-    byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-
     context.Response.ContentType = "text/html";
-    context.Response.ContentLength64 = buffer.Length;
-    context.Response.OutputStream.Write(buffer, 0, buffer.Length);
+    context.Response.ContentLength64 = fileBytes.Length;
+    context.Response.OutputStream.Write(fileBytes, 0, fileBytes.Length);
 
     context.Response.OutputStream.Close();
   }
