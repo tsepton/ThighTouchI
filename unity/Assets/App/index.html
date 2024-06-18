@@ -36,6 +36,13 @@
             grid-template-columns: 3fr 1fr;
         }
 
+        #ratio {
+            font-size: small;
+            margin: 0.3em;
+            width: 100%;
+            text-align: center;
+        }
+
         .buttons {
             display: flex;
             justify-content: center;
@@ -65,10 +72,13 @@
 <body>
     <div class="container">
         <div id="timers"></div>
-        <div class="buttons">
-            <button onclick="sendRequest('previous')" class="elicitationBtn">◄</button>
-            <button onclick="markPreviousStepAsDone()" id="timerBtn">◉</button>
-            <button onclick="sendRequest('next')" class="elicitationBtn">►</button>
+        <div>
+            <div id="ratio"></div>
+            <div class="buttons">
+                <button onclick="sendRequest('previous')" class="elicitationBtn">◄</button>
+                <button onclick="markPreviousStepAsDone()" id="timerBtn">◉</button>
+                <button onclick="sendRequest('next')" class="elicitationBtn">►</button>
+            </div>
         </div>
     </div>
 
@@ -110,8 +120,9 @@
                 name.innerText = step.Name;
                 timer.innerText = `${(step.Diff ?? Date.now() - steps[steps.length - 1].Beginning) / 1000.0}s`;
                 document.getElementById('timers').appendChild(name);
-                document.getElementById('timers').appendChild(timer); 
+                document.getElementById('timers').appendChild(timer);
             });
+            document.getElementById('ratio').innerHTML = `${steps.length}/24`;
         }
     </script>
 </body>
