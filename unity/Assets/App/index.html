@@ -6,36 +6,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elicitation control page</title>
     <style>
+        html {
+            font-family: Arial, sans-serif;
+        }
+
         body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            width: fit-content;
+        }
+
+        #timers {
+            font-size: large;
+            margin: 1em;
+            align-self: flex-start;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+        }
+
+        .buttons {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
         }
 
         button {
-            padding: 1em;
             font-size: large;
+            border: none;
+            padding: 1em;
+            margin: 1em;
             cursor: pointer;
-            width: 20em;
-            margin: 3em;
+        }
+
+        #timerBtn {
+            background-color: #3695f4;
+            color: white;
+        }
+
+        .elicitationBtn {
+            background-color: #4CAF50;
+            color: white;
         }
     </style>
 </head>
 
 <body>
-    <button onclick="sendRequest('previous')">Previous</button>
-    <button onclick="sendRequest('next')">Next</button>
+    <div class="container">
+        <div id="timers"></div>
+        <div class="buttons">
+            <button onclick="sendRequest('previous')" class="elicitationBtn">◄</button>
+            <button onclick="markPreviousStepAsDone()" id="timerBtn">◉</button>
+            <button onclick="sendRequest('next')" class="elicitationBtn">►</button>
+        </div>
+    </div>
 
     <script>
+        // let steps : {Name: string, Index: number, Time: number, Beginning?: number, Diff?: number}[];
+        let steps = [];
+
+        setInterval(updateInterface, 20);
+
         function sendRequest(action) {
+            markPreviousStepAsDone();
+
             const xhr = new XMLHttpRequest();
             const url = `/${action}/`;
             xhr.open("POST", url, true);
+            xhr.addEventListener("readystatechange", () => {
+                if (xhr.readyState !== 4) return;
+                const data = JSON.parse(xhr.responseText);
+                if (data.Name === "") return;
+                steps.push({ ...data, Beginning: Date.now() });
+            });
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.send();
+        }
+
+        function markPreviousStepAsDone() {
+            if (noTimer()) return;
+            steps[steps.length - 1].Diff = Date.now() - steps[steps.length - 1].Beginning;
+        }
+
+        const noTimer = () => steps.length === 0 || !!steps[steps.length - 1].Diff;
+
+        function updateInterface() {
+            // TODO: being framework number 1, over react or angular
+            document.getElementById('timers').innerHTML = '';
+            steps.forEach(step => {
+                const name = document.createElement('div');
+                const timer = document.createElement('div');
+                name.innerText = step.Name;
+                timer.innerText = `${(step.Diff ?? Date.now() - steps[steps.length - 1].Beginning) / 1000.0}s`;
+                document.getElementById('timers').appendChild(name);
+                document.getElementById('timers').appendChild(timer); 
+            });
         }
     </script>
 </body>
