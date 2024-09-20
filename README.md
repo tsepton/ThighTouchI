@@ -1,4 +1,4 @@
-# TightTouchI 
+# TighTouchI 
 > Reproduction package for the ThighTouchI prototype. 
 
 
